@@ -17,7 +17,30 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Current Date"
         android:id="@+id/dateText"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="30dp" />
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="30dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="92dp"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal"
+        android:weightSum="1">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:text="View"
+            android:id="@+id/buttonview"
+            android:layout_weight=".10" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:text="Add"
+            android:id="@+id/buttonadd"
+            android:layout_weight="0.10" />
+    </LinearLayout>
 
 </FrameLayout>
