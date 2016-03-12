@@ -123,9 +123,6 @@ public class viewevent extends Fragment {
                     ((MainActivity) getActivity()).deleteEvent(elist.indexOf(tmp));
                     elist.remove(tmp);
                     adapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(viewevent.this.getActivity(),
-                            "No Events On Current Date", Toast.LENGTH_SHORT).show();
                 }
             }
         });

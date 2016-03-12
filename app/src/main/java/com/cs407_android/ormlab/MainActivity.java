@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity
 
     ArrayAdapter adapter;
     Context context;
-
     public static ArrayList<AnEvent> eventList;
 
     //Uncomment once ready
@@ -84,7 +83,6 @@ public class MainActivity extends AppCompatActivity
                             event.getMonth(), event.getYear(),event.getDisplay());
 
                     eventList.add(tmp);
-                    Toast.makeText(this, "Database Populated.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -105,7 +103,7 @@ public class MainActivity extends AppCompatActivity
 
         //Close and reopen database to ensure Guest object is saved
         closeReopenDatabase();
-        Toast.makeText(this, "Event Added.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Add Success.", Toast.LENGTH_SHORT).show();
     }
 
     public void deleteEvent(int index){
@@ -113,7 +111,7 @@ public class MainActivity extends AppCompatActivity
         AnEvent ed = eventList.get(index);
         eventDao.delete(ed);
         eventList.remove(ed);
-        Toast.makeText(this, "Delete Successful.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Delete Success.", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -129,7 +127,7 @@ public class MainActivity extends AppCompatActivity
         ArrayList<String> eventStrings = new ArrayList<>();
         for(AnEvent event : eventList){
             eventStrings.add(event.getMonth() + " / " + event.getDay() + " / " + event.getYear()+
-                    "\nName: " + event.getName() + "\nTime: " + "\nLocation: " + event.getLocation()
+                    "\nName: " + event.getName() + "\nLocation: " + event.getLocation()
                     + "\nDescription: " +  event.getDescription());
         }
         return eventStrings;
