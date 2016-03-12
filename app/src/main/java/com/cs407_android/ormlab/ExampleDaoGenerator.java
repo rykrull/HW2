@@ -27,6 +27,7 @@ public class ExampleDaoGenerator {
         event.addIntProperty("day");
         event.addIntProperty("month");
         event.addIntProperty("year");
+        event.addBooleanProperty("display");
 
         /* //guestList table
         Entity guestList = schema.addEntity("GuestList");

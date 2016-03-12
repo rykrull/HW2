@@ -7,8 +7,11 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
+
+import java.util.Calendar;
 
 
 /**
@@ -21,8 +24,12 @@ import android.widget.TextView;
  */
 public class calendar extends Fragment {
 
+    private Button addButton, viewButton;
     private CalendarView calendarView;
     private TextView dateDisplay;
+    private int day;
+    private int month;
+    private int year;
 
     private OnFragmentInteractionListener mListener;
 
@@ -45,6 +52,9 @@ public class calendar extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        month = Calendar.getInstance().get(Calendar.MONTH);
+        year = Calendar.getInstance().get(Calendar.YEAR);
     }
 
     @Override
@@ -52,24 +62,45 @@ public class calendar extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
-
         calendarView = (CalendarView) view.findViewById(R.id.calendarView2);
+        addButton = (Button) view.findViewById(R.id.buttonadd);
+        viewButton = (Button) view.findViewById(R.id.buttonview);
         dateDisplay = (TextView) view.findViewById(R.id.dateText);
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener(){
-                                                 @Override
-                                                 public void onSelectedDayChange(CalendarView calendarView, int i, int i1, int i2){
-                                                     dateDisplay.setText("Date: "+i1+" / "+i2+" / " + i);
-                                                     getFragmentManager()
-                                                             .beginTransaction()
-                                                             .replace(R.id.main_fragment_container, event.newInstance(i,i1,i2))
-                                                             .addToBackStack(null)
-                                                             .commit();
-                                                 }
-
-                                             }
-        );
-
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int i, int i1, int i2) {
+                dateDisplay.setText("Date: " + i1 + " / " + i2 + " / " + i);
+                day = i2;
+                month = i1;
+                year = i;
+            }
+        });
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_fragment_container, event.newInstance(year, month, day))
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+        viewButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_fragment_container, viewevent.newInstance(year, month, day))
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
     }
 
     // TODO: Rename method, update argument and hook method into UI event

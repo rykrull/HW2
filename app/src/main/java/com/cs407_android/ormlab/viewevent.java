@@ -7,36 +7,43 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link event.OnFragmentInteractionListener} interface
+ * {@link viewevent.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link event#newInstance} factory method to
+ * Use the {@link viewevent#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class event extends Fragment {
-
+public class viewevent extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_PARAM3 = "param3";
 
-    private int year;
-    private int month;
-    private int day;
+    private int year, month, day, i;
 
-    private TextView dateView;
-    private Button saveChanges;
-    private EditText name, description, location, start, end;
+    private ListView list;
+    private Button delete, calbutton;
+
+    private ArrayAdapter adapter;
+    private static ArrayList<String> elist;
+    private static ArrayList<String> edlist;
 
     private OnFragmentInteractionListener mListener;
 
-    public event() {
+    public viewevent() {
         // Required empty public constructor
     }
 
@@ -47,11 +54,13 @@ public class event extends Fragment {
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
      * @param param3 Parameter 3.
-     * @return A new instance of fragment event.
+     * @return A new instance of fragment viewevent.
      */
     // TODO: Rename and change types and number of parameters
-    public static event newInstance(int param1, int param2, int param3) {
-        event fragment = new event();
+    public static viewevent newInstance(int param1, int param2, int param3) {
+        edlist = new ArrayList<>();
+        elist = new ArrayList<>();
+        viewevent fragment = new viewevent();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, param1);
         args.putInt(ARG_PARAM2, param2);
@@ -74,29 +83,56 @@ public class event extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_event, container, false);
-        dateView = (TextView)view.findViewById(R.id.theDate);
-        saveChanges = (Button)view.findViewById(R.id.saveButton);
-        description = (EditText) view.findViewById(R.id.editTextDetails);
-        name = (EditText) view.findViewById(R.id.editTextName);
-        location = (EditText) view.findViewById(R.id.editTextLocation);
-        start = (EditText) view.findViewById(R.id.editTextStart);
-        end = (EditText) view.findViewById(R.id.editTextEnd);
-
-        dateView.setText("Date: " + month + " / " + day + " / " + year);
+        View view = inflater.inflate(R.layout.fragment_viewevent, container, false);
+        list = (ListView) view.findViewById(R.id.listView);
+        delete = (Button) view.findViewById(R.id.buttondelete);
+        calbutton = (Button) view.findViewById(R.id.buttoncal);
+        elist = ((MainActivity)getActivity()).getEventList();
+        String date = month + " / " + day + " / " + year;
+        for(String e : elist){
+            if (e.contains(day+ "") && e.contains(month+ "") && e.contains(year+ "")){
+                edlist.add(e);
+            }
+        }
+        list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        adapter = new ArrayAdapter<String>(getActivity(), R.layout.itemlist, edlist);
+        list.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        saveChanges.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
-                ((MainActivity)getActivity()).addEvent(name.getText().toString()
-                        ,day, month, year, start.getText().toString(), end.getText().toString(),
-                        location.getText().toString(), description.getText().toString());
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+
+                view.setSelected(true);
+                i = position;
+
+            }
+        });
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!elist.isEmpty()) {
+                    String tmp = edlist.remove(i);
+                    ((MainActivity) getActivity()).deleteEvent(elist.indexOf(tmp));
+                    elist.remove(tmp);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(viewevent.this.getActivity(),
+                            "No Events On Current Date", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        calbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 getFragmentManager()
                         .beginTransaction()
                         .replace(R.id.main_fragment_container, calendar.newInstance())
@@ -104,9 +140,10 @@ public class event extends Fragment {
                         .commit();
             }
         });
-    }
 
-    // TODO: Rename method, update argument and hook method into UI event
+
+    }
+        // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

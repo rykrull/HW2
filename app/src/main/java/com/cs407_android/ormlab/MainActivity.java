@@ -17,20 +17,20 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
-    implements calendar.OnFragmentInteractionListener, event.OnFragmentInteractionListener{
+    implements calendar.OnFragmentInteractionListener, event.OnFragmentInteractionListener, viewevent.OnFragmentInteractionListener{
 
     ArrayAdapter adapter;
     Context context;
 
-    public static ArrayList<String> guestList;
+    public static ArrayList<AnEvent> eventList;
 
     //Uncomment once ready
-    DaoMaster.DevOpenHelper guestBookDBHelper;
-    SQLiteDatabase guestBookDB;
+    DaoMaster.DevOpenHelper eventDBHelper;
+    SQLiteDatabase eventDB;
     DaoMaster daoMaster;
     DaoSession daoSession;
-    GuestDao guestDao;
-    List<Guest> guestListFromDB;
+    AnEventDao eventDao;
+    List<AnEvent> eventListFromDB;
 
 
     @Override
@@ -40,16 +40,8 @@ public class MainActivity extends AppCompatActivity
 
         //instantiate objects
         context = this;
-        guestList = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, guestList);
-
-        //set up ListView
-
+        eventList = new ArrayList<>();
         initDatabase();
-        adapter.notifyDataSetChanged();
-
-
-        //set up submit button
 
         getFragmentManager()
                 .beginTransaction()
@@ -60,53 +52,87 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void initDatabase()
+   public void initDatabase()
     {
-        guestBookDBHelper = new DaoMaster.DevOpenHelper(this, "ORM.sqlite", null);
-        guestBookDB = guestBookDBHelper.getWritableDatabase();
+        eventDBHelper = new DaoMaster.DevOpenHelper(this, "ORM.sqlite", null);
+        eventDB = eventDBHelper.getWritableDatabase();
 
-        //Get DaoMaster
-        daoMaster = new DaoMaster(guestBookDB);
+        daoMaster = new DaoMaster(eventDB);
 
-        //Create database and tables
-        daoMaster.createAllTables(guestBookDB, true);
+        daoMaster.createAllTables(eventDB, true);
 
-        //Create DaoSession
+
         daoSession = daoMaster.newSession();
 
-        //Create customer addition/removal instances
-        guestDao = daoSession.getGuestDao();
+        eventDao = daoSession.getAnEventDao();
 
-
-        if (guestDao.queryBuilder().where(
-            GuestDao.Properties.Display.eq(true)).list() == null)
-        {
+        if(eventDao.queryBuilder().where(
+                AnEventDao.Properties.Display.eq(true)).list() == null){
             closeReopenDatabase();
         }
-        guestListFromDB = guestDao.queryBuilder().where(
-                GuestDao.Properties.Display.eq(true)).list();
 
-        if (guestListFromDB != null) {
+        eventListFromDB = eventDao.queryBuilder().where(
+                AnEventDao.Properties.Display.eq(true)).list();
 
-            for (Guest guest : guestListFromDB)
-            {
-                if (guest == null)
-                {
+        if(eventListFromDB != null){
+            for(AnEvent event : eventListFromDB){
+                if(event == null){
                     return;
                 }
-                Toast.makeText(context, "Added Guests from Database", Toast.LENGTH_SHORT).show();
-                guestList.add(guest.getFirstName() + " " + guest.getLastName());
+                else{
+                    AnEvent tmp = new AnEvent(event.getId(), event.getName(), event.getLocation(),event.getDescription(), event.getDay(),
+                            event.getMonth(), event.getYear(),event.getDisplay());
+
+                    eventList.add(tmp);
+                    Toast.makeText(this, "Database Populated.", Toast.LENGTH_SHORT).show();
+                }
             }
-            adapter.notifyDataSetChanged();
         }
+
+
+    }
+
+    public void addEvent(String name, int day, int month, int year, String start, String end,
+                         String location, String description)
+    {
+        //Generate random Id for Event object to place in database
+        Random rand = new Random();
+        AnEvent tmp = new AnEvent(rand.nextLong(), name, location,
+                description, day, month,
+                year,true);
+        eventDao.insert(tmp);
+        eventList.add(tmp);
+
+        //Close and reopen database to ensure Guest object is saved
+        closeReopenDatabase();
+        Toast.makeText(this, "Event Added.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void deleteEvent(int index){
+
+        AnEvent ed = eventList.get(index);
+        eventDao.delete(ed);
+        eventList.remove(ed);
+        Toast.makeText(this, "Delete Successful.", Toast.LENGTH_SHORT).show();
+
     }
 
 
     private void closeDatabase()
     {
         daoSession.clear();
-        guestBookDB.close();
-        guestBookDBHelper.close();
+        eventDB.close();
+        eventDBHelper.close();
+    }
+
+    public ArrayList<String> getEventList(){
+        ArrayList<String> eventStrings = new ArrayList<>();
+        for(AnEvent event : eventList){
+            eventStrings.add(event.getMonth() + " / " + event.getDay() + " / " + event.getYear()+
+                    "\nName: " + event.getName() + "\nTime: " + "\nLocation: " + event.getLocation()
+                    + "\nDescription: " +  event.getDescription());
+        }
+        return eventStrings;
     }
 
     private void closeReopenDatabase()
@@ -114,20 +140,17 @@ public class MainActivity extends AppCompatActivity
 
         closeDatabase();
 
-        guestBookDBHelper = new DaoMaster.DevOpenHelper(this, "ORM.sqlite", null);
-        guestBookDB = guestBookDBHelper.getWritableDatabase();
+        eventDBHelper = new DaoMaster.DevOpenHelper(this, "ORM.sqlite", null);
+        eventDB = eventDBHelper.getWritableDatabase();
 
         //Get DaoMaster
-        daoMaster = new DaoMaster(guestBookDB);
-
-        //Create database and tables
-        daoMaster.createAllTables(guestBookDB, true);
+        daoMaster = new DaoMaster(eventDB);
 
         //Create DaoSession
         daoSession = daoMaster.newSession();
 
         //Create customer addition/removal instances
-        guestDao = daoSession.getGuestDao();
+        eventDao = daoSession.getAnEventDao();
     }
 
     public void onFragmentInteraction(Uri uri){

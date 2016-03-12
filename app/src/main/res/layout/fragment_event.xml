@@ -30,7 +30,7 @@
         android:id="@+id/editTextDetails"
         android:layout_gravity="center"
         android:hint="Event Details"
-        android:layout_marginTop="50dp" />
+        android:layout_marginTop="10dp" />
 
     <EditText
         android:layout_width="fill_parent"
@@ -47,5 +47,31 @@
         android:layout_gravity="center"
         android:layout_marginBottom="100dp"
         android:hint="Event Location" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="97dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="75dp">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="time"
+            android:ems="10"
+            android:id="@+id/editTextStart"
+            android:layout_weight="1"
+            android:hint="Start Time" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="time"
+            android:ems="10"
+            android:id="@+id/editTextEnd"
+            android:layout_weight="1"
+            android:hint="End Time" />
+    </LinearLayout>
 
 </FrameLayout>
